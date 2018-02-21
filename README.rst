@@ -1,4 +1,4 @@
-|travis|_ |coveralls|_ |pypi|_ |pyversions|_ |womm|_
+|travis|_ |coveralls|_ |pypi|_ |womm|_
 
 .. |travis| image:: https://img.shields.io/travis/wimglenn/oyaml.svg?branch=master
 .. _travis: https://travis-ci.org/wimglenn/oyaml
@@ -22,4 +22,4 @@ oyaml is a drop-in replacement for `PyYAML <http://pyyaml.org/wiki/PyYAML>`_ whi
 
    import oyaml as yaml
 
-Just import as shown above, and no longer be annoyed by screwed-up mappings when dumping/loading.
+Just `pip install oyaml`, and import as shown above.  You'll no longer be annoyed by screwed-up mappings when dumping/loading.
