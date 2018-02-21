@@ -16,10 +16,10 @@
 oyaml
 =====
 
-oyaml is a drop-in replacement for `PyYAML <http://pyyaml.org/wiki/PyYAML>`_ which preserves dict ordering.  Both Python 2 and Python 3 are supported.
+oyaml is a drop-in replacement for `PyYAML <http://pyyaml.org/wiki/PyYAML>`_ which preserves dict ordering.  Both Python 2 and Python 3 are supported. Just ``pip install oyaml``, and import as shown below:
 
 .. code-block:: python
 
    import oyaml as yaml
 
-Just `pip install oyaml`, and import as shown above.  You'll no longer be annoyed by screwed-up mappings when dumping/loading.
+You'll no longer be annoyed by screwed-up mappings when dumping/loading.
