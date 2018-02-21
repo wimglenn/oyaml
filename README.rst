@@ -9,9 +9,6 @@
 .. |pypi| image:: https://img.shields.io/pypi/v/oyaml.svg
 .. _pypi: https://pypi.python.org/pypi/oyaml
 
-.. |pyversions| image:: https://img.shields.io/pypi/pyversions/oyaml.svg
-.. _pyversions: 
-
 .. |womm| image:: https://cdn.rawgit.com/nikku/works-on-my-machine/v0.2.0/badge.svg
 .. _womm: https://github.com/nikku/works-on-my-machine
 
@@ -19,7 +16,7 @@
 oyaml
 =====
 
-oyaml is a drop-in replacement for `PyYAML <http://pyyaml.org/wiki/PyYAML>`_ which preserves dict ordering.
+oyaml is a drop-in replacement for `PyYAML <http://pyyaml.org/wiki/PyYAML>`_ which preserves dict ordering.  Both Python 2 and Python 3 are supported.
 
 .. code-block:: python
 
