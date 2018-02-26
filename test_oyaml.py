@@ -29,3 +29,38 @@ def test_loads_to_std_dict():
     loaded = yaml.load('{k1: v1, k3: v3, k2: v2}')
     assert not isinstance(loaded, OrderedDict)
     assert isinstance(loaded, dict)
+
+
+def test_anchors_and_references():
+    text = '''
+        defaults:
+          all: &all
+            product: foo
+          development: &development
+            <<: *all
+            profile: bar
+
+        development:
+          platform:
+            <<: *development
+            host: baz
+    '''
+    expected_load = {
+        'defaults': {
+            'all': {
+                'product': 'foo',
+            },
+            'development': {
+                'product': 'foo',
+                'profile': 'bar',
+            },
+        },
+        'development': {
+            'platform': {
+                'host': 'baz',
+                'product': 'foo',
+                'profile': 'bar',
+            },
+        },
+    }
+    assert yaml.load(text) == expected_load
