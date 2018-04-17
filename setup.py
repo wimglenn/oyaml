@@ -1,8 +1,8 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name='oyaml',
-    version='0.2',
+    version='0.3',
     description='Ordered YAML: drop-in replacement for PyYAML which preserves dict ordering',
     author='Wim Glenn',
     author_email='hey@wimglenn.com',
