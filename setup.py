@@ -4,6 +4,7 @@ setup(
     name='oyaml',
     version='0.3',
     description='Ordered YAML: drop-in replacement for PyYAML which preserves dict ordering',
+    long_description=open('README.rst').read(),
     author='Wim Glenn',
     author_email='hey@wimglenn.com',
     url='https://github.com/wimglenn/oyaml',
