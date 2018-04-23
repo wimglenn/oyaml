@@ -18,6 +18,7 @@ def map_constructor(loader, node):
 
 pyyaml.add_representer(dict, map_representer)
 pyyaml.add_representer(OrderedDict, map_representer)
+pyyaml.add_representer(dict, map_representer, Dumper=pyyaml.dumper.SafeDumper)
 pyyaml.add_representer(OrderedDict, map_representer, Dumper=pyyaml.dumper.SafeDumper)
 
 
