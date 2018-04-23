@@ -3,7 +3,6 @@ from collections import OrderedDict
 from types import GeneratorType
 
 import pytest
-from yaml.representer import RepresenterError
 
 import oyaml as yaml
 
@@ -21,6 +20,12 @@ def test_safe_dump():
 
 def test_dump_all():
     assert yaml.dump_all(documents=[data, {}]) == '{x: 1, z: 3, y: 2}\n--- {}\n'
+
+
+def test_dump_and_safe_dump_match():
+    mydict = {'x': 1, 'z': 2, 'y': 3}
+    # don't know if mydict is ordered in the implementation or not (but don't care)
+    assert yaml.dump(mydict) == yaml.safe_dump(mydict)
 
 
 def test_safe_dump_all():
@@ -60,7 +65,7 @@ def test_subclass_dump():
 
     data = MyOrderedDict([('x', 1), ('y', 2)])
     assert '!!python/object/apply:test_oyaml.MyOrderedDict' in yaml.dump(data)
-    with pytest.raises(RepresenterError) as cm:
+    with pytest.raises(yaml.pyyaml.representer.RepresenterError) as cm:
         yaml.safe_dump(data)
     assert str(cm.value) == "cannot represent an object: MyOrderedDict([('x', 1), ('y', 2)])"
 
