@@ -18,14 +18,26 @@ def test_safe_dump():
     assert yaml.safe_dump(data) == '{x: 1, z: 3, y: 2}\n'
 
 
+@pytest.mark.skipif(yaml.pyyaml.__version__ < '4', reason="requires PyYAML version >= 4")
+def test_danger_dump():
+    assert yaml.danger_dump(data) == '{x: 1, z: 3, y: 2}\n'
+
+
 def test_dump_all():
     assert yaml.dump_all(documents=[data, {}]) == '{x: 1, z: 3, y: 2}\n--- {}\n'
 
 
+@pytest.mark.skipif(yaml.pyyaml.__version__ >= '4', reason="requires PyYAML version < 4")
 def test_dump_and_safe_dump_match():
     mydict = {'x': 1, 'z': 2, 'y': 3}
     # don't know if mydict is ordered in the implementation or not (but don't care)
     assert yaml.dump(mydict) == yaml.safe_dump(mydict)
+
+
+@pytest.mark.skipif(yaml.pyyaml.__version__ < '4', reason="requires PyYAML version >= 4")
+def test_danger_dump_and_safe_dump_match():
+    mydict = {'x': 1, 'z': 2, 'y': 3}
+    assert yaml.danger_dump(mydict) == yaml.safe_dump(mydict)
 
 
 def test_safe_dump_all():
@@ -112,4 +124,27 @@ def test_anchors_and_references():
             },
         },
     }
+    assert yaml.load(text) == expected_load
+
+
+def test_omap():
+    text = '''
+        Bestiary: !!omap
+          - aardvark: African pig-like ant eater. Ugly.
+          - anteater: South-American ant eater. Two species.
+          - anaconda: South-American constrictor snake. Scaly.
+    '''
+    expected_load = {
+        'Bestiary': ([
+            ('aardvark', 'African pig-like ant eater. Ugly.'),
+            ('anteater', 'South-American ant eater. Two species.'),
+            ('anaconda', 'South-American constrictor snake. Scaly.'),
+        ])
+    }
+    assert yaml.load(text) == expected_load
+
+
+def test_omap_flow_style():
+    text = 'Numbers: !!omap [ one: 1, two: 2, three : 3 ]'
+    expected_load = {'Numbers': ([('one', 1), ('two', 2), ('three', 3)])}
     assert yaml.load(text) == expected_load
