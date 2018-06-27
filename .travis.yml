@@ -11,12 +11,17 @@ python:
   - "pypy"
   - "pypy3.5"
 
+env:
+  - PYYAML_VERSION="3.12"
+  - PYYAML_VERSION="4.1"
+
 matrix:
   fast_finish: true
   allow_failures:
   - python: "nightly"
 
 install: 
+  - pip install pyyaml~=$PYYAML_VERSION
   - pip install --editable .
   - pip install pytest-cov coveralls
 

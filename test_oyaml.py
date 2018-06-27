@@ -58,16 +58,26 @@ def test_loads_to_std_dict():
     assert isinstance(loaded, dict)
 
 
-def test_subclass_dump():
+class MyOrderedDict(OrderedDict):
+    pass
 
-    class MyOrderedDict(OrderedDict):
-        pass
 
+@pytest.mark.skipif(yaml.pyyaml.__version__ >= '4', reason="requires PyYAML version < 4")
+def test_subclass_dump_pyyaml3():
     data = MyOrderedDict([('x', 1), ('y', 2)])
     assert '!!python/object/apply:test_oyaml.MyOrderedDict' in yaml.dump(data)
     with pytest.raises(yaml.pyyaml.representer.RepresenterError) as cm:
         yaml.safe_dump(data)
     assert str(cm.value) == "cannot represent an object: MyOrderedDict([('x', 1), ('y', 2)])"
+
+
+@pytest.mark.skipif(yaml.pyyaml.__version__ < '4', reason="requires PyYAML version >= 4")
+def test_subclass_dump_pyyaml4():
+    data = MyOrderedDict([('x', 1), ('y', 2)])
+    assert '!!python/object/apply:test_oyaml.MyOrderedDict' in yaml.danger_dump(data)
+    with pytest.raises(yaml.pyyaml.representer.RepresenterError) as cm:
+        yaml.dump(data)
+    assert str(cm.value) == "('cannot represent an object', MyOrderedDict([('x', 1), ('y', 2)]))"
 
 
 def test_anchors_and_references():
