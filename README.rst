@@ -7,7 +7,7 @@
 .. _coveralls: https://coveralls.io/github/wimglenn/oyaml?branch=master
 
 .. |pypi| image:: https://img.shields.io/pypi/v/oyaml.svg
-.. _pypi: https://pypi.python.org/pypi/oyaml
+.. _pypi: https://pypi.org/project/oyaml
 
 .. |womm| image:: https://cdn.rawgit.com/nikku/works-on-my-machine/v0.2.0/badge.svg
 .. _womm: https://github.com/nikku/works-on-my-machine
