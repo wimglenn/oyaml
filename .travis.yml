@@ -14,6 +14,7 @@ python:
 env:
   - PYYAML_VERSION="3.13"
   # - PYYAML_VERSION="4.1"  # this was pulled from the index (!) ..wtf, Ingy?
+  - PYYAML_VERSION="4.2b4"
 
 matrix:
   fast_finish: true

@@ -10,6 +10,10 @@ import oyaml as yaml
 data = OrderedDict([('x', 1), ('z', 3), ('y', 2)])
 
 
+# this release was pulled from index, but still might be seen in the wild
+pyyaml_41 = yaml.pyyaml.__version__ == '4.1'
+
+
 def test_dump():
     assert yaml.dump(data) == '{x: 1, z: 3, y: 2}\n'
 
@@ -18,7 +22,7 @@ def test_safe_dump():
     assert yaml.safe_dump(data) == '{x: 1, z: 3, y: 2}\n'
 
 
-@pytest.mark.skipif(yaml.pyyaml.__version__ < '4', reason="requires PyYAML version >= 4")
+@pytest.mark.skipif(not pyyaml_41, reason="requires PyYAML version == 4.1")
 def test_danger_dump():
     assert yaml.danger_dump(data) == '{x: 1, z: 3, y: 2}\n'
 
@@ -27,14 +31,14 @@ def test_dump_all():
     assert yaml.dump_all(documents=[data, {}]) == '{x: 1, z: 3, y: 2}\n--- {}\n'
 
 
-@pytest.mark.skipif(yaml.pyyaml.__version__ >= '4', reason="requires PyYAML version < 4")
+@pytest.mark.skipif(pyyaml_41, reason="requires PyYAML version != 4.1")
 def test_dump_and_safe_dump_match():
     mydict = {'x': 1, 'z': 2, 'y': 3}
     # don't know if mydict is ordered in the implementation or not (but don't care)
     assert yaml.dump(mydict) == yaml.safe_dump(mydict)
 
 
-@pytest.mark.skipif(yaml.pyyaml.__version__ < '4', reason="requires PyYAML version >= 4")
+@pytest.mark.skipif(not pyyaml_41, reason="requires PyYAML version == 4.1")
 def test_danger_dump_and_safe_dump_match():
     mydict = {'x': 1, 'z': 2, 'y': 3}
     assert yaml.danger_dump(mydict) == yaml.safe_dump(mydict)
@@ -49,6 +53,11 @@ def test_load():
     assert loaded == {'x': 1, 'z': 3, 'y': 2}
 
 
+def test_safe_load():
+    loaded = yaml.safe_load('{x: 1, z: 3, y: 2}')
+    assert loaded == {'x': 1, 'z': 3, 'y': 2}
+
+
 def test_load_all():
     gen = yaml.load_all('{x: 1, z: 3, y: 2}\n--- {}\n')
     assert isinstance(gen, GeneratorType)
@@ -57,15 +66,28 @@ def test_load_all():
     assert ordered_data == data
 
 
-@pytest.mark.skipif(sys.version_info >= (3,7), reason="requires python3.6-")
+@pytest.mark.skipif(sys.version_info >= (3, 7), reason="requires python3.6-")
 def test_loads_to_ordered_dict():
     loaded = yaml.load('{x: 1, z: 3, y: 2}')
     assert isinstance(loaded, OrderedDict)
 
 
-@pytest.mark.skipif(sys.version_info < (3,7), reason="requires python3.7+")
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires python3.7+")
 def test_loads_to_std_dict():
     loaded = yaml.load('{x: 1, z: 3, y: 2}')
+    assert not isinstance(loaded, OrderedDict)
+    assert isinstance(loaded, dict)
+
+
+@pytest.mark.skipif(sys.version_info >= (3, 7), reason="requires python3.6-")
+def test_safe_loads_to_ordered_dict():
+    loaded = yaml.safe_load('{x: 1, z: 3, y: 2}')
+    assert isinstance(loaded, OrderedDict)
+
+
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires python3.7+")
+def test_safe_loads_to_std_dict():
+    loaded = yaml.safe_load('{x: 1, z: 3, y: 2}')
     assert not isinstance(loaded, OrderedDict)
     assert isinstance(loaded, dict)
 
@@ -74,22 +96,20 @@ class MyOrderedDict(OrderedDict):
     pass
 
 
-@pytest.mark.skipif(yaml.pyyaml.__version__ >= '4', reason="requires PyYAML version < 4")
+@pytest.mark.skipif(pyyaml_41, reason="requires PyYAML version != 4.1")
 def test_subclass_dump_pyyaml3():
     data = MyOrderedDict([('x', 1), ('y', 2)])
     assert '!!python/object/apply:test_oyaml.MyOrderedDict' in yaml.dump(data)
-    with pytest.raises(yaml.pyyaml.representer.RepresenterError) as cm:
+    with pytest.raises(yaml.pyyaml.representer.RepresenterError, match='cannot represent an object') as cm:
         yaml.safe_dump(data)
-    assert str(cm.value) == "cannot represent an object: MyOrderedDict([('x', 1), ('y', 2)])"
 
 
-@pytest.mark.skipif(yaml.pyyaml.__version__ < '4', reason="requires PyYAML version >= 4")
+@pytest.mark.skipif(not pyyaml_41, reason="requires PyYAML version == 4.1")
 def test_subclass_dump_pyyaml4():
     data = MyOrderedDict([('x', 1), ('y', 2)])
     assert '!!python/object/apply:test_oyaml.MyOrderedDict' in yaml.danger_dump(data)
-    with pytest.raises(yaml.pyyaml.representer.RepresenterError) as cm:
+    with pytest.raises(yaml.pyyaml.representer.RepresenterError, match='cannot represent an object') as cm:
         yaml.dump(data)
-    assert str(cm.value) == "('cannot represent an object', MyOrderedDict([('x', 1), ('y', 2)]))"
 
 
 def test_anchors_and_references():
