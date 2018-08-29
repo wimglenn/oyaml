@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='oyaml',
-    version='0.5',
+    version='0.6',
     description='Ordered YAML: drop-in replacement for PyYAML which preserves dict ordering',
     long_description=open('README.rst').read(),
     author='Wim Glenn',
