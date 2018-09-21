@@ -168,3 +168,46 @@ def test_omap_flow_style():
     text = 'Numbers: !!omap [ one: 1, two: 2, three : 3 ]'
     expected_load = {'Numbers': ([('one', 1), ('two', 2), ('three', 3)])}
     assert yaml.load(text) == expected_load
+
+
+def test_merge():
+    text = '''
+        - &CENTER { x: 1, y: 2 }
+        - &LEFT { x: 0, y: 2 }
+        - &BIG { r: 10 }
+        - &SMALL { r: 1 }
+        
+        # All the following maps are equal:
+        
+        - # Explicit keys
+          x: 1
+          y: 2
+          r: 10
+          label: center/big
+        
+        - # Merge one map
+          << : *CENTER
+          r: 10
+          label: center/big
+        
+        - # Merge multiple maps
+          << : [ *CENTER, *BIG ]
+          label: center/big
+        
+        - # Override
+          << : [ *BIG, *LEFT, *SMALL ]
+          x: 1
+          label: center/big
+    '''
+    data = yaml.load(text)
+    assert len(data) == 8
+    center, left, big, small, map1, map2, map3, map4 = data
+    assert center == {'x': 1, 'y': 2}
+    assert left == {'x': 0, 'y': 2}
+    assert big == {'r': 10}
+    assert small == {'r': 1}
+    expected = {'x': 1, 'y': 2, 'r': 10, 'label': 'center/big'}
+    assert map1 == expected
+    assert map2 == expected
+    assert map3 == expected
+    assert map4 == expected
