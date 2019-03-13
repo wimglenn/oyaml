@@ -11,8 +11,8 @@ from oyaml import _std_dict_is_order_preserving
 data = OrderedDict([("x", 1), ("z", 3), ("y", 2)])
 
 
-# this release was pulled from index, but still might be seen in the wild
-pyyaml_41 = yaml.pyyaml.__version__ == "4.1"
+# this series was pulled from index, but still might be seen in the wild
+pyyaml_v4x = yaml.pyyaml.__version__.startswith("4")
 
 
 def test_dump():
@@ -23,11 +23,6 @@ def test_safe_dump():
     assert yaml.safe_dump(data, default_flow_style=None) == "{x: 1, z: 3, y: 2}\n"
 
 
-@pytest.mark.skipif(not pyyaml_41, reason="requires PyYAML version == 4.1")
-def test_danger_dump():
-    assert yaml.danger_dump(data) == "{x: 1, z: 3, y: 2}\n"
-
-
 def test_dump_all():
     assert (
         yaml.dump_all(documents=[data, {}], default_flow_style=None)
@@ -35,17 +30,10 @@ def test_dump_all():
     )
 
 
-@pytest.mark.skipif(pyyaml_41, reason="requires PyYAML version != 4.1")
 def test_dump_and_safe_dump_match():
     mydict = {"x": 1, "z": 2, "y": 3}
     # don't know if mydict is ordered in the implementation or not (but don't care)
     assert yaml.dump(mydict) == yaml.safe_dump(mydict)
-
-
-@pytest.mark.skipif(not pyyaml_41, reason="requires PyYAML version == 4.1")
-def test_danger_dump_and_safe_dump_match():
-    mydict = {"x": 1, "z": 2, "y": 3}
-    assert yaml.danger_dump(mydict) == yaml.safe_dump(mydict)
 
 
 def test_safe_dump_all():
@@ -103,20 +91,11 @@ class MyOrderedDict(OrderedDict):
     pass
 
 
-@pytest.mark.skipif(pyyaml_41, reason="requires PyYAML version != 4.1")
-def test_subclass_dump_pyyaml3():
+def test_subclass_dump():
     data = MyOrderedDict([("x", 1), ("y", 2)])
     assert "!!python/object/apply:test_oyaml.MyOrderedDict" in yaml.dump(data)
     with pytest.raises(RepresenterError, match="cannot represent an object"):
         yaml.safe_dump(data)
-
-
-@pytest.mark.skipif(not pyyaml_41, reason="requires PyYAML version == 4.1")
-def test_subclass_dump_pyyaml4():
-    data = MyOrderedDict([("x", 1), ("y", 2)])
-    assert "!!python/object/apply:test_oyaml.MyOrderedDict" in yaml.danger_dump(data)
-    with pytest.raises(RepresenterError, match="cannot represent an object"):
-        yaml.dump(data)
 
 
 def test_anchors_and_references():

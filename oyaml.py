@@ -21,7 +21,7 @@ def map_constructor(loader, node):
 
 
 if pyyaml.safe_dump is pyyaml.dump:
-    # PyYAML v4.1
+    # PyYAML v4.x
     SafeDumper = pyyaml.dumper.Dumper
     DangerDumper = pyyaml.dumper.DangerDumper
 else:
