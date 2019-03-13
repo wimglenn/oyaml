@@ -11,10 +11,6 @@ from oyaml import _std_dict_is_order_preserving
 data = OrderedDict([("x", 1), ("z", 3), ("y", 2)])
 
 
-# this series was pulled from index, but still might be seen in the wild
-pyyaml_v4x = yaml.pyyaml.__version__.startswith("4")
-
-
 def test_dump():
     assert yaml.dump(data, default_flow_style=None) == "{x: 1, z: 3, y: 2}\n"
 
