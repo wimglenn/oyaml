@@ -7,23 +7,21 @@ python:
   - "3.4"
   - "3.5"
   - "3.6"
+  - "3.7-dev"
   - "nightly"
   - "pypy"
-  - "pypy3.5"
+  - "pypy3"
 
 env:
   - PYYAML_VERSION="3.13"
   # - PYYAML_VERSION="4.1"  # this was pulled from the index (!) ..wtf, Ingy?
   - PYYAML_VERSION="4.2b4"
+  - PYYAML_VERSION="5.1"
 
 matrix:
   fast_finish: true
   allow_failures:
   - python: "nightly"
-  include:
-    - python: 3.7
-      dist: xenial
-      sudo: true
 
 install: 
   - pip install pyyaml~=$PYYAML_VERSION

@@ -1,93 +1,84 @@
-import sys
 from collections import OrderedDict
 from types import GeneratorType
 
 import pytest
+from yaml.representer import RepresenterError
 
 import oyaml as yaml
+from oyaml import _std_dict_is_order_preserving
 
 
-data = OrderedDict([('x', 1), ('z', 3), ('y', 2)])
-
-
-# this release was pulled from index, but still might be seen in the wild
-pyyaml_41 = yaml.pyyaml.__version__ == '4.1'
+data = OrderedDict([("x", 1), ("z", 3), ("y", 2)])
 
 
 def test_dump():
-    assert yaml.dump(data) == '{x: 1, z: 3, y: 2}\n'
+    assert yaml.dump(data, default_flow_style=None) == "{x: 1, z: 3, y: 2}\n"
 
 
 def test_safe_dump():
-    assert yaml.safe_dump(data) == '{x: 1, z: 3, y: 2}\n'
-
-
-@pytest.mark.skipif(not pyyaml_41, reason="requires PyYAML version == 4.1")
-def test_danger_dump():
-    assert yaml.danger_dump(data) == '{x: 1, z: 3, y: 2}\n'
+    assert yaml.safe_dump(data, default_flow_style=None) == "{x: 1, z: 3, y: 2}\n"
 
 
 def test_dump_all():
-    assert yaml.dump_all(documents=[data, {}]) == '{x: 1, z: 3, y: 2}\n--- {}\n'
+    assert (
+        yaml.dump_all(documents=[data, {}], default_flow_style=None)
+        == "{x: 1, z: 3, y: 2}\n--- {}\n"
+    )
 
 
-@pytest.mark.skipif(pyyaml_41, reason="requires PyYAML version != 4.1")
 def test_dump_and_safe_dump_match():
-    mydict = {'x': 1, 'z': 2, 'y': 3}
+    mydict = {"x": 1, "z": 2, "y": 3}
     # don't know if mydict is ordered in the implementation or not (but don't care)
     assert yaml.dump(mydict) == yaml.safe_dump(mydict)
 
 
-@pytest.mark.skipif(not pyyaml_41, reason="requires PyYAML version == 4.1")
-def test_danger_dump_and_safe_dump_match():
-    mydict = {'x': 1, 'z': 2, 'y': 3}
-    assert yaml.danger_dump(mydict) == yaml.safe_dump(mydict)
-
-
 def test_safe_dump_all():
-    assert yaml.safe_dump_all(documents=[data, {}]) == '{x: 1, z: 3, y: 2}\n--- {}\n'
+    assert (
+        yaml.safe_dump_all(documents=[data, {}], default_flow_style=None)
+        == "{x: 1, z: 3, y: 2}\n--- {}\n"
+    )
 
 
 def test_load():
-    loaded = yaml.load('{x: 1, z: 3, y: 2}')
-    assert loaded == {'x': 1, 'z': 3, 'y': 2}
+    loaded = yaml.load("{x: 1, z: 3, y: 2}")
+    assert loaded == {"x": 1, "z": 3, "y": 2}
 
 
 def test_safe_load():
-    loaded = yaml.safe_load('{x: 1, z: 3, y: 2}')
-    assert loaded == {'x': 1, 'z': 3, 'y': 2}
+    loaded = yaml.safe_load("{x: 1, z: 3, y: 2}")
+    assert loaded == {"x": 1, "z": 3, "y": 2}
 
 
 def test_load_all():
-    gen = yaml.load_all('{x: 1, z: 3, y: 2}\n--- {}\n')
+    gen = yaml.load_all("{x: 1, z: 3, y: 2}\n--- {}\n")
     assert isinstance(gen, GeneratorType)
     ordered_data, empty_dict = gen
     assert empty_dict == {}
     assert ordered_data == data
 
 
-@pytest.mark.skipif(sys.version_info >= (3, 7), reason="requires python3.6-")
+@pytest.mark.skipif(_std_dict_is_order_preserving, reason="requires old dict impl")
 def test_loads_to_ordered_dict():
-    loaded = yaml.load('{x: 1, z: 3, y: 2}')
+    loaded = yaml.load("{x: 1, z: 3, y: 2}")
     assert isinstance(loaded, OrderedDict)
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires python3.7+")
+@pytest.mark.skipif(not _std_dict_is_order_preserving, reason="requires new dict impl")
 def test_loads_to_std_dict():
-    loaded = yaml.load('{x: 1, z: 3, y: 2}')
+    loaded = yaml.load("{x: 1, z: 3, y: 2}")
     assert not isinstance(loaded, OrderedDict)
     assert isinstance(loaded, dict)
 
 
-@pytest.mark.skipif(sys.version_info >= (3, 7), reason="requires python3.6-")
+@pytest.mark.skipif(_std_dict_is_order_preserving, reason="requires old dict impl")
 def test_safe_loads_to_ordered_dict():
-    loaded = yaml.safe_load('{x: 1, z: 3, y: 2}')
+    loaded = yaml.safe_load("{x: 1, z: 3, y: 2}")
     assert isinstance(loaded, OrderedDict)
 
 
-@pytest.mark.skipif(sys.version_info < (3, 7), reason="requires python3.7+")
+@pytest.mark.skipif(not _std_dict_is_order_preserving, reason="requires new dict impl")
 def test_safe_loads_to_std_dict():
-    loaded = yaml.safe_load('{x: 1, z: 3, y: 2}')
+    loaded = yaml.safe_load("{x: 1, z: 3, y: 2}")
     assert not isinstance(loaded, OrderedDict)
     assert isinstance(loaded, dict)
 
@@ -96,24 +87,15 @@ class MyOrderedDict(OrderedDict):
     pass
 
 
-@pytest.mark.skipif(pyyaml_41, reason="requires PyYAML version != 4.1")
-def test_subclass_dump_pyyaml3():
-    data = MyOrderedDict([('x', 1), ('y', 2)])
-    assert '!!python/object/apply:test_oyaml.MyOrderedDict' in yaml.dump(data)
-    with pytest.raises(yaml.pyyaml.representer.RepresenterError, match='cannot represent an object') as cm:
+def test_subclass_dump():
+    data = MyOrderedDict([("x", 1), ("y", 2)])
+    assert "!!python/object/apply:test_oyaml.MyOrderedDict" in yaml.dump(data)
+    with pytest.raises(RepresenterError, match="cannot represent an object"):
         yaml.safe_dump(data)
 
 
-@pytest.mark.skipif(not pyyaml_41, reason="requires PyYAML version == 4.1")
-def test_subclass_dump_pyyaml4():
-    data = MyOrderedDict([('x', 1), ('y', 2)])
-    assert '!!python/object/apply:test_oyaml.MyOrderedDict' in yaml.danger_dump(data)
-    with pytest.raises(yaml.pyyaml.representer.RepresenterError, match='cannot represent an object') as cm:
-        yaml.dump(data)
-
-
 def test_anchors_and_references():
-    text = '''
+    text = """
         defaults:
           all: &all
             product: foo
@@ -125,53 +107,46 @@ def test_anchors_and_references():
           platform:
             <<: *development
             host: baz
-    '''
+    """
     expected_load = {
-        'defaults': {
-            'all': {
-                'product': 'foo',
-            },
-            'development': {
-                'product': 'foo',
-                'profile': 'bar',
-            },
+        "defaults": {
+            "all": {"product": "foo"},
+            "development": {"product": "foo", "profile": "bar"},
         },
-        'development': {
-            'platform': {
-                'host': 'baz',
-                'product': 'foo',
-                'profile': 'bar',
-            },
+        "development": {
+            "platform": {"host": "baz", "product": "foo", "profile": "bar"}
         },
     }
     assert yaml.load(text) == expected_load
 
 
 def test_omap():
-    text = '''
+    text = """
         Bestiary: !!omap
           - aardvark: African pig-like ant eater. Ugly.
           - anteater: South-American ant eater. Two species.
           - anaconda: South-American constrictor snake. Scaly.
-    '''
+    """
     expected_load = {
-        'Bestiary': ([
-            ('aardvark', 'African pig-like ant eater. Ugly.'),
-            ('anteater', 'South-American ant eater. Two species.'),
-            ('anaconda', 'South-American constrictor snake. Scaly.'),
-        ])
+        "Bestiary": (
+            [
+                ("aardvark", "African pig-like ant eater. Ugly."),
+                ("anteater", "South-American ant eater. Two species."),
+                ("anaconda", "South-American constrictor snake. Scaly."),
+            ]
+        )
     }
     assert yaml.load(text) == expected_load
 
 
 def test_omap_flow_style():
-    text = 'Numbers: !!omap [ one: 1, two: 2, three : 3 ]'
-    expected_load = {'Numbers': ([('one', 1), ('two', 2), ('three', 3)])}
+    text = "Numbers: !!omap [ one: 1, two: 2, three : 3 ]"
+    expected_load = {"Numbers": ([("one", 1), ("two", 2), ("three", 3)])}
     assert yaml.load(text) == expected_load
 
 
 def test_merge():
-    text = '''
+    text = """
         - &CENTER { x: 1, y: 2 }
         - &LEFT { x: 0, y: 2 }
         - &BIG { r: 10 }
@@ -198,15 +173,15 @@ def test_merge():
           << : [ *BIG, *LEFT, *SMALL ]
           x: 1
           label: center/big
-    '''
+    """
     data = yaml.load(text)
     assert len(data) == 8
     center, left, big, small, map1, map2, map3, map4 = data
-    assert center == {'x': 1, 'y': 2}
-    assert left == {'x': 0, 'y': 2}
-    assert big == {'r': 10}
-    assert small == {'r': 1}
-    expected = {'x': 1, 'y': 2, 'r': 10, 'label': 'center/big'}
+    assert center == {"x": 1, "y": 2}
+    assert left == {"x": 0, "y": 2}
+    assert big == {"r": 10}
+    assert small == {"r": 1}
+    expected = {"x": 1, "y": 2, "r": 10, "label": "center/big"}
     assert map1 == expected
     assert map2 == expected
     assert map3 == expected
