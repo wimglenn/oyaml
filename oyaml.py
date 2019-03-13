@@ -24,13 +24,9 @@ if pyyaml.safe_dump is pyyaml.dump:
     # PyYAML v4.1
     SafeDumper = pyyaml.dumper.Dumper
     DangerDumper = pyyaml.dumper.DangerDumper
-    SafeLoader = pyyaml.loader.Loader
-    DangerLoader = pyyaml.loader.DangerLoader
 else:
     SafeDumper = pyyaml.dumper.SafeDumper
     DangerDumper = pyyaml.dumper.Dumper
-    SafeLoader = pyyaml.loader.SafeLoader
-    DangerLoader = pyyaml.loader.Loader
 
 pyyaml.add_representer(dict, map_representer, Dumper=SafeDumper)
 pyyaml.add_representer(OrderedDict, map_representer, Dumper=SafeDumper)
@@ -40,13 +36,9 @@ pyyaml.add_representer(OrderedDict, map_representer, Dumper=DangerDumper)
 
 if not _std_dict_is_order_preserving:
     tag = "tag:yaml.org,2002:map"
-    pyyaml.add_constructor(tag, map_constructor, Loader=SafeLoader)
-    pyyaml.add_constructor(tag, map_constructor, Loader=DangerLoader)
-    try:
-        pyyaml.add_constructor(tag, map_constructor, Loader=pyyaml.loader.FullLoader)
-    except AttributeError:
-        # FullLoader is new in PyYAML v5.1+
-        pass
+    for loader_name in pyyaml.loader.__all__:
+        Loader = getattr(pyyaml.loader, loader_name)
+        pyyaml.add_constructor(tag, map_constructor, Loader=Loader)
 
 
 del map_constructor, map_representer
