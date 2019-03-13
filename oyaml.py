@@ -1,10 +1,14 @@
+import platform
 import sys
 from collections import OrderedDict
 
 import yaml as pyyaml
 
 
-_items = 'viewitems' if sys.version_info < (3,) else 'items'
+_items = "viewitems" if sys.version_info < (3,) else "items"
+_std_dict_is_order_preserving = sys.version_info >= (3, 7) or (
+    sys.version_info >= (3, 6) and platform.python_implementation() == "CPython"
+)
 
 
 def map_representer(dumper, data):
@@ -34,9 +38,15 @@ pyyaml.add_representer(dict, map_representer, Dumper=DangerDumper)
 pyyaml.add_representer(OrderedDict, map_representer, Dumper=DangerDumper)
 
 
-if sys.version_info < (3, 7):
-    pyyaml.add_constructor('tag:yaml.org,2002:map', map_constructor, Loader=SafeLoader)
-    pyyaml.add_constructor('tag:yaml.org,2002:map', map_constructor, Loader=DangerLoader)
+if not _std_dict_is_order_preserving:
+    tag = "tag:yaml.org,2002:map"
+    pyyaml.add_constructor(tag, map_constructor, Loader=SafeLoader)
+    pyyaml.add_constructor(tag, map_constructor, Loader=DangerLoader)
+    try:
+        pyyaml.add_constructor(tag, map_constructor, Loader=pyyaml.loader.FullLoader)
+    except AttributeError:
+        # FullLoader is new in PyYAML v5.1+
+        pass
 
 
 del map_constructor, map_representer
