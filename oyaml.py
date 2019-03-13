@@ -34,17 +34,15 @@ pyyaml.add_representer(dict, map_representer, Dumper=DangerDumper)
 pyyaml.add_representer(OrderedDict, map_representer, Dumper=DangerDumper)
 
 
+Loader = None
 if not _std_dict_is_order_preserving:
-    tag = "tag:yaml.org,2002:map"
     for loader_name in pyyaml.loader.__all__:
         Loader = getattr(pyyaml.loader, loader_name)
-        pyyaml.add_constructor(tag, map_constructor, Loader=Loader)
-
-
-del map_constructor, map_representer
+        pyyaml.add_constructor("tag:yaml.org,2002:map", map_constructor, Loader=Loader)
 
 
 # Merge PyYAML namespace into ours.
 # This allows users a drop-in replacement:
 #   import oyaml as yaml
+del map_constructor, map_representer, SafeDumper, DangerDumper, Loader
 from yaml import *
