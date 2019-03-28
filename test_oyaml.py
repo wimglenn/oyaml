@@ -2,6 +2,7 @@ from collections import OrderedDict
 from types import GeneratorType
 
 import pytest
+from yaml.constructor import ConstructorError
 from yaml.representer import RepresenterError
 
 import oyaml as yaml
@@ -186,3 +187,9 @@ def test_merge():
     assert map2 == expected
     assert map3 == expected
     assert map4 == expected
+
+
+@pytest.mark.skipif(_std_dict_is_order_preserving, reason="requires old dict impl")
+def test_unhashable_error_context():
+    with pytest.raises(ConstructorError, match=r".*line.*column.*"):
+        yaml.safe_load("{foo: bar}: baz")

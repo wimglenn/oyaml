@@ -16,6 +16,9 @@ def map_representer(dumper, data):
 
 
 def map_constructor(loader, node):
+    if not _std_dict_is_order_preserving:
+        # trigger any contextual error
+        loader.construct_mapping(node)
     loader.flatten_mapping(node)
     return OrderedDict(loader.construct_pairs(node))
 
