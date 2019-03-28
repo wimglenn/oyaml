@@ -17,7 +17,12 @@ def map_representer(dumper, data):
 
 def map_constructor(loader, node):
     loader.flatten_mapping(node)
-    return OrderedDict(loader.construct_pairs(node))
+    pairs = loader.construct_pairs(node)
+    try:
+        return OrderedDict(pairs)
+    except TypeError:
+        loader.construct_mapping(node)  # trigger any contextual error
+        raise
 
 
 if pyyaml.safe_dump is pyyaml.dump:
