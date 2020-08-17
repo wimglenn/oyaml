@@ -25,29 +25,29 @@ def map_constructor(loader, node):
         raise
 
 
-if pyyaml.safe_dump is pyyaml.dump:
-    # PyYAML v4.x
-    SafeDumper = pyyaml.dumper.Dumper
-    DangerDumper = pyyaml.dumper.DangerDumper
+_loaders = [getattr(pyyaml.loader, x) for x in pyyaml.loader.__all__]
+_dumpers = [getattr(pyyaml.dumper, x) for x in pyyaml.dumper.__all__]
+try:
+    _cyaml = pyyaml.cyaml.__all__
+except AttributeError:
+    pass
 else:
-    SafeDumper = pyyaml.dumper.SafeDumper
-    DangerDumper = pyyaml.dumper.Dumper
+    _loaders += [getattr(pyyaml.cyaml, x) for x in _cyaml if x.endswith("Loader")]
+    _dumpers += [getattr(pyyaml.cyaml, x) for x in _cyaml if x.endswith("Dumper")]
 
-pyyaml.add_representer(dict, map_representer, Dumper=SafeDumper)
-pyyaml.add_representer(OrderedDict, map_representer, Dumper=SafeDumper)
-pyyaml.add_representer(dict, map_representer, Dumper=DangerDumper)
-pyyaml.add_representer(OrderedDict, map_representer, Dumper=DangerDumper)
-
+Dumper = None
+for Dumper in _dumpers:
+    pyyaml.add_representer(dict, map_representer, Dumper=Dumper)
+    pyyaml.add_representer(OrderedDict, map_representer, Dumper=Dumper)
 
 Loader = None
 if not _std_dict_is_order_preserving:
-    for loader_name in pyyaml.loader.__all__:
-        Loader = getattr(pyyaml.loader, loader_name)
+    for Loader in _loaders:
         pyyaml.add_constructor("tag:yaml.org,2002:map", map_constructor, Loader=Loader)
 
 
 # Merge PyYAML namespace into ours.
 # This allows users a drop-in replacement:
 #   import oyaml as yaml
-del map_constructor, map_representer, SafeDumper, DangerDumper, Loader
+del map_constructor, map_representer, Loader, Dumper
 from yaml import *

@@ -192,3 +192,17 @@ def test_merge():
 def test_unhashable_error_context():
     with pytest.raises(ConstructorError, match=r".*line.*column.*"):
         yaml.safe_load("{foo: bar}: baz")
+
+
+@pytest.mark.skipif(not hasattr(yaml, "CSafeLoader"), reason="requires cyaml loaders")
+def test_explicit_loader():
+    data = yaml.load("{x: 1, z: 3, y: 2}", Loader=yaml.CSafeLoader)
+    assert data == {"x": 1, "z": 3, "y": 2}
+    assert list(data) == ["x", "z", "y"]
+
+
+@pytest.mark.skipif(not hasattr(yaml, "CSafeDumper"), reason="requires cyaml dumpers")
+def test_explicit_dumper():
+    data = OrderedDict([("x", 1), ("z", 3), ("y", 2)])
+    text = yaml.dump(data, Dumper=yaml.CSafeDumper, default_flow_style=None)
+    assert text == "{x: 1, z: 3, y: 2}\n"
