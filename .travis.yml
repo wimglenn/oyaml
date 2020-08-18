@@ -4,10 +4,10 @@ sudo: false
 
 python:
   - "2.7"
-  - "3.4"
   - "3.5"
   - "3.6"
-  - "3.7-dev"
+  - "3.7"
+  - "3.8"
   - "nightly"
   - "pypy"
   - "pypy3"
@@ -16,7 +16,7 @@ env:
   - PYYAML_VERSION="3.13"
   # - PYYAML_VERSION="4.1"  # this was pulled from the index (!) ..wtf, Ingy?
   - PYYAML_VERSION="4.2b4"
-  - PYYAML_VERSION="5.1"
+  - PYYAML_VERSION="5.3"
 
 matrix:
   fast_finish: true
