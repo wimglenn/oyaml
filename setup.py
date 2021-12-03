@@ -11,4 +11,5 @@ setup(
     license="MIT",
     py_modules=["oyaml"],
     install_requires=["pyyaml"],
+    options={"bdist_wheel": {"universal": True}},
 )

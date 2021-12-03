@@ -41,7 +41,7 @@ def test_safe_dump_all():
 
 
 def test_load():
-    loaded = yaml.load("{x: 1, z: 3, y: 2}")
+    loaded = yaml.safe_load("{x: 1, z: 3, y: 2}")
     assert loaded == {"x": 1, "z": 3, "y": 2}
 
 
@@ -51,7 +51,7 @@ def test_safe_load():
 
 
 def test_load_all():
-    gen = yaml.load_all("{x: 1, z: 3, y: 2}\n--- {}\n")
+    gen = yaml.safe_load_all("{x: 1, z: 3, y: 2}\n--- {}\n")
     assert isinstance(gen, GeneratorType)
     ordered_data, empty_dict = gen
     assert empty_dict == {}
@@ -60,13 +60,13 @@ def test_load_all():
 
 @pytest.mark.skipif(_std_dict_is_order_preserving, reason="requires old dict impl")
 def test_loads_to_ordered_dict():
-    loaded = yaml.load("{x: 1, z: 3, y: 2}")
+    loaded = yaml.safe_load("{x: 1, z: 3, y: 2}")
     assert isinstance(loaded, OrderedDict)
 
 
 @pytest.mark.skipif(not _std_dict_is_order_preserving, reason="requires new dict impl")
 def test_loads_to_std_dict():
-    loaded = yaml.load("{x: 1, z: 3, y: 2}")
+    loaded = yaml.safe_load("{x: 1, z: 3, y: 2}")
     assert not isinstance(loaded, OrderedDict)
     assert isinstance(loaded, dict)
 
@@ -118,7 +118,7 @@ def test_anchors_and_references():
             "platform": {"host": "baz", "product": "foo", "profile": "bar"}
         },
     }
-    assert yaml.load(text) == expected_load
+    assert yaml.safe_load(text) == expected_load
 
 
 def test_omap():
@@ -137,13 +137,13 @@ def test_omap():
             ]
         )
     }
-    assert yaml.load(text) == expected_load
+    assert yaml.safe_load(text) == expected_load
 
 
 def test_omap_flow_style():
     text = "Numbers: !!omap [ one: 1, two: 2, three : 3 ]"
     expected_load = {"Numbers": ([("one", 1), ("two", 2), ("three", 3)])}
-    assert yaml.load(text) == expected_load
+    assert yaml.safe_load(text) == expected_load
 
 
 def test_merge():
@@ -175,7 +175,7 @@ def test_merge():
           x: 1
           label: center/big
     """
-    data = yaml.load(text)
+    data = yaml.safe_load(text)
     assert len(data) == 8
     center, left, big, small, map1, map2, map3, map4 = data
     assert center == {"x": 1, "y": 2}
