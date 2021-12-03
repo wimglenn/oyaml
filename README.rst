@@ -1,10 +1,10 @@
-|travis|_ |coveralls|_ |pypi|_ |womm|_
+|actions|_ |codecov|_ |pypi|_ |womm|_
 
-.. |travis| image:: https://img.shields.io/travis/wimglenn/oyaml.svg?branch=master
-.. _travis: https://travis-ci.org/wimglenn/oyaml
+.. |actions| image:: https://github.com/wimglenn/oyaml/actions/workflows/tests.yml/badge.svg
+.. _actions: https://github.com/wimglenn/oyaml/actions/workflows/tests.yml
 
-.. |coveralls| image:: https://img.shields.io/coveralls/wimglenn/oyaml.svg
-.. _coveralls: https://coveralls.io/github/wimglenn/oyaml?branch=master
+.. |codecov| image:: https://codecov.io/gh/wimglenn/oyaml/branch/master/graph/badge.svg
+.. _codecov: https://codecov.io/gh/wimglenn/oyaml
 
 .. |pypi| image:: https://img.shields.io/pypi/v/oyaml.svg
 .. _pypi: https://pypi.org/project/oyaml

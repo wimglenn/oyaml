@@ -1,0 +1,39 @@
+name: tests
+
+on:
+  pull_request:
+    branches: ["master"]
+
+jobs:
+  tests:
+    name: "py${{ matrix.python-version }} / ${{ matrix.os }} / PyYAML~=${{ matrix.pyyaml-version }}"
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+        python-version: ["2.7", "3.6"]
+        pyyaml-version: ["3.13", "4.2b4", "5.4"]
+        include:
+          - { os: ubuntu-latest, python-version: "3.10", pyyaml-version: "6.0" }
+          - { os: macos-latest, python-version: "3.10", pyyaml-version: "6.0" }
+          - { os: windows-latest, python-version: "3.10", pyyaml-version: "6.0" }
+
+    steps:
+      - uses: "actions/checkout@v2"
+      - uses: "actions/setup-python@v2"
+        with:
+          python-version: "${{ matrix.python-version }}"
+          architecture: x64
+      - name: "Install"
+        run: |
+          python -VV
+          python -m pip install -q pytest pytest-cov pyyaml~=${{ matrix.pyyaml-version }} -e .
+          python -m pip freeze --all
+      - name: "Run tests py${{ matrix.python-version }} / ${{ matrix.os }} / PyYAML~=${{ matrix.pyyaml-version }}"
+        run: python -m pytest --cov-branch --cov=oyaml
+
+      - name: Upload coverage to Codecov
+        uses: "codecov/codecov-action@v1"
+        with:
+          fail_ci_if_error: true
