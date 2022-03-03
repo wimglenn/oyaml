@@ -1,9 +1,14 @@
+""" 
+Improved version of https://github.com/wimglenn/oyaml
+Changed PyYaml for ruamel.yaml 
+    
+Returns: improved methods which respect YAML mappings - YAML files are ordered
+"""
 import platform
 import sys
 from collections import OrderedDict
 
-import yaml as pyyaml
-
+import ruamel.yaml as pyyaml
 
 _items = "viewitems" if sys.version_info < (3,) else "items"
 _std_dict_is_order_preserving = sys.version_info >= (3, 7) or (
@@ -46,8 +51,8 @@ if not _std_dict_is_order_preserving:
         pyyaml.add_constructor("tag:yaml.org,2002:map", map_constructor, Loader=Loader)
 
 
-# Merge PyYAML namespace into ours.
+# Merge Ruamel YAML namespace into ours.
 # This allows users a drop-in replacement:
-#   import oyaml as yaml
 del map_constructor, map_representer, Loader, Dumper
-from yaml import *
+from ruamel.yaml import *
+
