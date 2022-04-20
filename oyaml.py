@@ -2,10 +2,16 @@ import platform
 import sys
 from collections import OrderedDict
 
-import yaml as pyyaml
+if sys.version_info < (3,):
+    import imp
+    pyyaml = imp.load_module('pyyaml', *imp.find_module('yaml'))
+    _items = "viewitems"
+else:
+    import importlib
+    pyyaml = importlib.import_module('yaml')
+    _items = "items"
 
 
-_items = "viewitems" if sys.version_info < (3,) else "items"
 _std_dict_is_order_preserving = sys.version_info >= (3, 7) or (
     sys.version_info >= (3, 6) and platform.python_implementation() == "CPython"
 )
