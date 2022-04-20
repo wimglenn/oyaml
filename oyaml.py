@@ -1,6 +1,7 @@
 import platform
 import sys
 from collections import OrderedDict
+import inspect
 
 if sys.version_info < (3,):
     import imp
@@ -56,4 +57,6 @@ if not _std_dict_is_order_preserving:
 # This allows users a drop-in replacement:
 #   import oyaml as yaml
 del map_constructor, map_representer, Loader, Dumper
-from yaml import *
+
+for name, member in inspect.getmembers(pyyaml):
+    globals()[name] = member
