@@ -1,4 +1,4 @@
-|actions|_ |codecov|_ |pypi|_ |womm|_
+|actions| |codecov| |pypi| |womm|
 
 .. |actions| image:: https://github.com/wimglenn/oyaml/actions/workflows/tests.yml/badge.svg
 .. _actions: https://github.com/wimglenn/oyaml/actions/workflows/tests.yml
